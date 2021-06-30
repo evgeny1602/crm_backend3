@@ -1,15 +1,21 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UsePipes } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UsePipes, Req } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { BackendValidationPipe } from 'src/shared/pipes/backendValidation.pipe';
 import { UserResponseInterface } from './types/userResponse.interface';
 import { LoginUserDto } from './dto/login-user.dto';
+import { ExpressRequestInterface } from 'src/types/expressRequest.interface';
 
 @Controller('users')
 export class UsersController {
 
   constructor(private readonly usersService: UsersService) { }
+
+  @Get('current')
+  async currentUser(@Req() request: ExpressRequestInterface): Promise<UserResponseInterface> {
+    return this.usersService.buildUserResponse(request.user);
+  }
 
   @Post('login')
   @UsePipes(new BackendValidationPipe())
@@ -30,10 +36,10 @@ export class UsersController {
     return this.usersService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
-  }
+  // @Get(':id')
+  // findOne(@Param('id') id: string) {
+  //   return this.usersService.findOne(+id);
+  // }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
