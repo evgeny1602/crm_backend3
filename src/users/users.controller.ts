@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UsePipes, Req, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UsePipes, Req, UseGuards, Query } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -7,6 +7,7 @@ import { UserResponseInterface } from './types/userResponse.interface';
 import { LoginUserDto } from './dto/login-user.dto';
 import { User } from './decorators/user.decorator';
 import { AuthGuard } from './guards/auth.guard';
+import { UsersResponseInterface } from './types/usersResponseInterface';
 
 @Controller('users')
 export class UsersController {
@@ -27,20 +28,25 @@ export class UsersController {
   }
 
   @Post()
+  // @UseGuards(AuthGuard)
   @UsePipes(new BackendValidationPipe())
   async create(@Body() createUserDto: CreateUserDto): Promise<UserResponseInterface> {
     const user = await this.usersService.create(createUserDto);
-    return this.usersService.buildUserResponse(user)
+    return this.usersService.buildUserResponse(user);
   }
 
   @Get()
-  findAll() {
-    return this.usersService.findAll();
+  @UseGuards(AuthGuard)
+  async findAll(@Query() query: any): Promise<UsersResponseInterface> {
+    const usersData = await this.usersService.findAll(query);
+    return this.usersService.buildUsersResponse(usersData.users, usersData.usersCount);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
+  @UseGuards(AuthGuard)
+  async findOne(@Param('id') id: string): Promise<UserResponseInterface> {
+    const user = await this.usersService.findOne(+id);
+    return this.usersService.buildUserResponse(user);
   }
 
   @Patch(':id')

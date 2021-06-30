@@ -1,6 +1,5 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
@@ -9,6 +8,8 @@ import { UserResponseInterface } from './types/userResponse.interface';
 import { sign } from 'jsonwebtoken';
 import { LoginUserDto } from './dto/login-user.dto';
 import { compare } from 'bcrypt';
+import { UsersResponseInterface } from './types/usersResponseInterface';
+import { DeleteResult, getRepository, Repository } from 'typeorm';
 
 @Injectable()
 export class UsersService {
@@ -52,12 +53,37 @@ export class UsersService {
     return this.usersRepository.save(user);
   }
 
-  findAll() {
-    return `This action returns all users`;
+  async findAll(query: any): Promise<{ users: User[], usersCount: number }> {
+    const queryBuilder = getRepository(User).createQueryBuilder('users');
+    const usersCount = await queryBuilder.getCount();
+    if (query.limit) {
+      queryBuilder.limit(query.limit);
+    }
+    if (query.offset) {
+      queryBuilder.offset(query.offset);
+    }
+    let orderType: "ASC" | "DESC" = 'ASC';
+    if (query.ordertype) {
+      orderType = query.ordertype.toUpperCase();
+    }
+    let order = 'id';
+    if (query.order) {
+      order = query.order;
+    }
+    queryBuilder.orderBy(`users.${order}`, orderType);
+    const users = await queryBuilder.getMany();
+    return {
+      users: users,
+      usersCount: usersCount
+    }
   }
 
   async findOne(id: number): Promise<User> {
-    return this.usersRepository.findOne({ id: id });
+    const user = await this.usersRepository.findOne(id);
+    if (!user) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+    return user;
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {
@@ -75,6 +101,23 @@ export class UsersService {
         ...user,
         token: this.generateJwt(user)
       }
+    }
+  }
+
+  buildUsersResponse(users: User[], usersCount: number): UsersResponseInterface {
+    let usersArr = [];
+    for (let user of users) {
+      delete user.password;
+      usersArr.push(
+        {
+          ...user,
+          token: this.generateJwt(user)
+        }
+      );
+    };
+    return {
+      users: usersArr,
+      usersCount: usersCount
     }
   }
 
