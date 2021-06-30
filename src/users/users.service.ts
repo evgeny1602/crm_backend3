@@ -7,11 +7,32 @@ import { User } from './entities/user.entity';
 import { JWT_SECRET } from 'src/config';
 import { UserResponseInterface } from './types/userResponse.interface';
 import { sign } from 'jsonwebtoken';
+import { LoginUserDto } from './dto/login-user.dto';
+import { compare } from 'bcrypt';
 
 @Injectable()
 export class UsersService {
 
   constructor(@InjectRepository(User) private readonly usersRepository: Repository<User>) { }
+
+  async login(loginUserDto: LoginUserDto): Promise<User> {
+    const user = await this.usersRepository.findOne(
+      {
+        login: loginUserDto.login
+      },
+      {
+        select: ['id', 'login', 'password', 'email', 'first_name', 'middle_name', 'last_name', 'is_active', 'image']
+      }
+    );
+    if (!user) {
+      throw new HttpException('User not found', HttpStatus.UNPROCESSABLE_ENTITY);
+    }
+    const isPasswordValid = await compare(loginUserDto.password, user.password);
+    if (!isPasswordValid) {
+      throw new HttpException('Password is invalid', HttpStatus.UNPROCESSABLE_ENTITY);
+    }
+    return user;
+  }
 
   async create(createUserDto: CreateUserDto): Promise<User> {
     const userByLogin = await this.usersRepository.findOne({
@@ -48,6 +69,7 @@ export class UsersService {
   }
 
   buildUserResponse(user: User): UserResponseInterface {
+    delete user.password;
     return {
       user: {
         ...user,

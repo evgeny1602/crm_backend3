@@ -4,17 +4,24 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { BackendValidationPipe } from 'src/shared/pipes/backendValidation.pipe';
 import { UserResponseInterface } from './types/userResponse.interface';
+import { LoginUserDto } from './dto/login-user.dto';
 
 @Controller('users')
 export class UsersController {
 
   constructor(private readonly usersService: UsersService) { }
 
+  @Post('login')
+  @UsePipes(new BackendValidationPipe())
+  async login(@Body() loginUserDto: LoginUserDto): Promise<UserResponseInterface> {
+    const user = await this.usersService.login(loginUserDto);
+    return this.usersService.buildUserResponse(user);
+  }
+
   @Post()
   @UsePipes(new BackendValidationPipe())
   async create(@Body() createUserDto: CreateUserDto): Promise<UserResponseInterface> {
     const user = await this.usersService.create(createUserDto);
-    delete user.password;
     return this.usersService.buildUserResponse(user)
   }
 
