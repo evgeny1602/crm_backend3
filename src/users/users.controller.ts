@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UsePipes, Req, UseGuards, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UsePipes, UseGuards, Query, HttpCode, HttpStatus } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -28,7 +28,7 @@ export class UsersController {
   }
 
   @Post()
-  // @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard)
   @UsePipes(new BackendValidationPipe())
   async create(@Body() createUserDto: CreateUserDto): Promise<UserResponseInterface> {
     const user = await this.usersService.create(createUserDto);
@@ -50,11 +50,15 @@ export class UsersController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
+  @UseGuards(AuthGuard)
+  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto): Promise<UserResponseInterface> {
+    const user = await this.usersService.update(+id, updateUserDto);
+    return this.usersService.buildUserResponse(user);
   }
 
   @Delete(':id')
+  @UseGuards(AuthGuard)
+  @HttpCode(HttpStatus.NO_CONTENT)
   remove(@Param('id') id: string) {
     return this.usersService.remove(+id);
   }

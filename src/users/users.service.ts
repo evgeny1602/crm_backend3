@@ -56,12 +56,16 @@ export class UsersService {
   async findAll(query: any): Promise<{ users: User[], usersCount: number }> {
     const queryBuilder = getRepository(User).createQueryBuilder('users');
     const usersCount = await queryBuilder.getCount();
+    let limit = 10;
     if (query.limit) {
-      queryBuilder.limit(query.limit);
+      limit = query.limt;
     }
+    queryBuilder.limit(limit);
+    let offset = 0;
     if (query.offset) {
-      queryBuilder.offset(query.offset);
+      offset = query.offset;
     }
+    queryBuilder.offset(offset);
     let orderType: "ASC" | "DESC" = 'ASC';
     if (query.ordertype) {
       orderType = query.ordertype.toUpperCase();
@@ -86,12 +90,21 @@ export class UsersService {
     return user;
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(id: number, updateUserDto: UpdateUserDto) {
+    const user = await this.usersRepository.findOne(id);
+    if (!user) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+    Object.assign(user, updateUserDto);
+    return this.usersRepository.save(user);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async remove(id: number): Promise<DeleteResult> {
+    const user = await this.usersRepository.findOne(id);
+    if (!user) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+    return await this.usersRepository.delete(id);
   }
 
   buildUserResponse(user: User): UserResponseInterface {
