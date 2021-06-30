@@ -5,7 +5,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { BackendValidationPipe } from 'src/shared/pipes/backendValidation.pipe';
 import { UserResponseInterface } from './types/userResponse.interface';
 import { LoginUserDto } from './dto/login-user.dto';
-import { ExpressRequestInterface } from 'src/types/expressRequest.interface';
+import { User } from './decorators/user.decorator';
 
 @Controller('users')
 export class UsersController {
@@ -13,8 +13,8 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) { }
 
   @Get('current')
-  async currentUser(@Req() request: ExpressRequestInterface): Promise<UserResponseInterface> {
-    return this.usersService.buildUserResponse(request.user);
+  async currentUser(@User() user: any): Promise<UserResponseInterface> {
+    return this.usersService.buildUserResponse(user);
   }
 
   @Post('login')
