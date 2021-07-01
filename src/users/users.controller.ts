@@ -47,7 +47,7 @@ export class UsersController {
   }
 
   @Post()
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   @UsePipes(new BackendValidationPipe())
   async create(
     @Body() createUserDto: CreateUserDto

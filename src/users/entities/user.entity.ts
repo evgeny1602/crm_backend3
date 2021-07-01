@@ -1,5 +1,6 @@
-import { BeforeInsert, Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { BeforeInsert, Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { hash } from 'bcrypt';
+import { Usergroup } from "src/usergroups/entities/usergroup.entity";
 
 @Entity({ name: 'users' })
 export class User {
@@ -29,6 +30,9 @@ export class User {
 
     @Column({ default: '' })
     image: string;
+
+    @ManyToOne(() => Usergroup, usergroup => usergroup.users, { onDelete: 'SET NULL', eager: true })
+    usergroup: Usergroup;
 
     @BeforeInsert()
     async hashPassword() {

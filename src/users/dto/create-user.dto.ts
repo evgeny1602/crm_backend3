@@ -1,4 +1,5 @@
 import { IsNotEmpty, IsEmail } from "class-validator";
+import { Usergroup } from "src/usergroups/entities/usergroup.entity";
 
 export class CreateUserDto {
 
@@ -21,5 +22,7 @@ export class CreateUserDto {
     readonly is_active?: boolean;
 
     readonly image?: string;
+
+    readonly usergroup: Usergroup;
 
 }

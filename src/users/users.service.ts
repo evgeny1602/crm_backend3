@@ -45,7 +45,8 @@ export class UsersService {
           'last_name',
           'is_active',
           'image'
-        ]
+        ],
+        relations: ['usergroup']
       }
     );
     if (!user) {
@@ -96,12 +97,41 @@ export class UsersService {
     query: any
   ): Promise<{ users: User[], usersCount: number }> {
     const queryBuilder = getRepository(User).createQueryBuilder('users');
+    queryBuilder.leftJoinAndSelect('users.usergroup', 'usergroups');
+    const columnsTosearch = [
+      ['usergroup_id', 'usergroupId'],
+      'login',
+      'email',
+      'first_name',
+      'middle_name',
+      'last_name',
+      'is_active'
+    ];
+    for (let column of columnsTosearch) {
+      let filterConfig = {};
+      let filterStr = '';
+      if (Array.isArray(column)) {
+        if (query[column[0]]) {
+          filterStr += column[1] + '=:' + column[0];
+          filterConfig[column[0]] = query[column[0]];
+        }
+      } else {
+        if (query[column]) {
+          filterStr += column + '=:' + column;
+          filterConfig[column] = query[column];
+        }
+      }
+      if (filterStr !== '') {
+        queryBuilder.andWhere('users.' + filterStr, filterConfig);
+      }
+    }
     const usersCount = await queryBuilder.getCount();
     queryBuilder.limit(query.limit ? query.limit : 10);
     queryBuilder.offset(query.offset ? query.offset : 0);
     const orderType: "ASC" | "DESC" = query.ordertype ? query.ordertype.toUpperCase() : 'ASC';
     const order: string = query.order ? query.order : 'id';
     queryBuilder.orderBy(`users.${order}`, orderType);
+    // console.log(queryBuilder.getQueryAndParameters())
     const users = await queryBuilder.getMany();
     return { users, usersCount }
   }
@@ -109,7 +139,10 @@ export class UsersService {
   async findOne(
     id: number
   ): Promise<User> {
-    const user = await this.usersRepository.findOne(id);
+    const user = await this.usersRepository.findOne(
+      id,
+      { relations: ['usergroup'] }
+    );
     if (!user) {
       throw new HttpException(
         'User not found',

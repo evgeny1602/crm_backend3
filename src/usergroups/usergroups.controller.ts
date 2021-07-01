@@ -28,7 +28,7 @@ export class UsergroupsController {
   ) { }
 
   @Post()
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   @UsePipes(new BackendValidationPipe())
   async create(
     @Body() createUsergroupDto: CreateUsergroupDto
