@@ -3,11 +3,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import ormconfig from './ormconfig';
 import { AuthMiddleware } from './users/middleware/auth.middleware';
 import { UsersModule } from './users/users.module';
+import { UsergroupsModule } from './usergroups/usergroups.module';
 
 @Module({
   imports: [
     TypeOrmModule.forRoot(ormconfig),
-    UsersModule
+    UsersModule,
+    UsergroupsModule
   ],
   controllers: [],
   providers: [],

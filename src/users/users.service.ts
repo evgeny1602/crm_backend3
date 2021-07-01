@@ -1,4 +1,8 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -9,34 +13,67 @@ import { sign } from 'jsonwebtoken';
 import { LoginUserDto } from './dto/login-user.dto';
 import { compare } from 'bcrypt';
 import { UsersResponseInterface } from './types/usersResponseInterface';
-import { DeleteResult, getRepository, Repository } from 'typeorm';
+import {
+  DeleteResult,
+  getRepository,
+  Repository
+} from 'typeorm';
 
 @Injectable()
 export class UsersService {
 
-  constructor(@InjectRepository(User) private readonly usersRepository: Repository<User>) { }
+  constructor(
+    @InjectRepository(User)
+    private readonly usersRepository: Repository<User>
+  ) { }
 
-  async login(loginUserDto: LoginUserDto): Promise<User> {
+  async login(
+    loginUserDto: LoginUserDto
+  ): Promise<User> {
     const user = await this.usersRepository.findOne(
       {
         login: loginUserDto.login
       },
       {
-        select: ['id', 'login', 'password', 'email', 'first_name', 'middle_name', 'last_name', 'is_active', 'image']
+        select: [
+          'id',
+          'login',
+          'password',
+          'email',
+          'first_name',
+          'middle_name',
+          'last_name',
+          'is_active',
+          'image'
+        ]
       }
     );
     if (!user) {
-      throw new HttpException('User not found', HttpStatus.UNPROCESSABLE_ENTITY);
+      throw new HttpException(
+        'User not found',
+        HttpStatus.UNPROCESSABLE_ENTITY
+      );
     }
-    const isPasswordValid = await compare(loginUserDto.password, user.password);
+    const isPasswordValid = await compare(
+      loginUserDto.password,
+      user.password
+    );
     if (!isPasswordValid) {
-      throw new HttpException('Password is invalid', HttpStatus.UNPROCESSABLE_ENTITY);
+      throw new HttpException(
+        'Password is invalid',
+        HttpStatus.UNPROCESSABLE_ENTITY
+      );
     }
     return user;
   }
 
-  async create(createItemDto: CreateUserDto): Promise<User> {
-    const uniqueColumns = ['login', 'email'];
+  async create(
+    createItemDto: CreateUserDto
+  ): Promise<User> {
+    const uniqueColumns = [
+      'login',
+      'email'
+    ];
     for (const column of uniqueColumns) {
       let filter = {};
       filter[column] = createItemDto[column];
@@ -44,7 +81,10 @@ export class UsersService {
       if (item) {
         let msg = `${column} already exists.`;
         msg = msg.replace(/^\w/, (c) => c.toUpperCase())
-        throw new HttpException(msg, HttpStatus.UNPROCESSABLE_ENTITY)
+        throw new HttpException(
+          msg,
+          HttpStatus.UNPROCESSABLE_ENTITY
+        )
       }
     }
     const item = new User();
@@ -52,7 +92,9 @@ export class UsersService {
     return this.usersRepository.save(item);
   }
 
-  async findAll(query: any): Promise<{ users: User[], usersCount: number }> {
+  async findAll(
+    query: any
+  ): Promise<{ users: User[], usersCount: number }> {
     const queryBuilder = getRepository(User).createQueryBuilder('users');
     const usersCount = await queryBuilder.getCount();
     queryBuilder.limit(query.limit ? query.limit : 10);
@@ -61,21 +103,26 @@ export class UsersService {
     const order: string = query.order ? query.order : 'id';
     queryBuilder.orderBy(`users.${order}`, orderType);
     const users = await queryBuilder.getMany();
-    return {
-      users: users,
-      usersCount: usersCount
-    }
+    return { users, usersCount }
   }
 
-  async findOne(id: number): Promise<User> {
+  async findOne(
+    id: number
+  ): Promise<User> {
     const user = await this.usersRepository.findOne(id);
     if (!user) {
-      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+      throw new HttpException(
+        'User not found',
+        HttpStatus.NOT_FOUND
+      );
     }
     return user;
   }
 
-  async update(id: number, updateUserDto: UpdateUserDto) {
+  async update(
+    id: number,
+    updateUserDto: UpdateUserDto
+  ): Promise<User> {
     const user = await this.findOne(id);
     Object.assign(user, updateUserDto);
     return this.usersRepository.save(user);
@@ -83,10 +130,12 @@ export class UsersService {
 
   async remove(id: number): Promise<DeleteResult> {
     const user = await this.findOne(id);
-    return await this.usersRepository.delete(id);
+    return this.usersRepository.delete(user.id);
   }
 
-  buildUserResponse(user: User): UserResponseInterface {
+  buildUserResponse(
+    user: User
+  ): UserResponseInterface {
     delete user.password;
     return {
       user: {
@@ -96,7 +145,10 @@ export class UsersService {
     }
   }
 
-  buildUsersResponse(users: User[], usersCount: number): UsersResponseInterface {
+  buildUsersResponse(
+    users: User[],
+    usersCount: number
+  ): UsersResponseInterface {
     let usersArr = [];
     for (let user of users) {
       delete user.password;
