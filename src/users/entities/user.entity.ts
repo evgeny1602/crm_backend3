@@ -6,13 +6,13 @@ export class User {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column()
+    @Column({ unique: true })
     login: string;
 
     @Column({ select: false })
     password: string;
 
-    @Column()
+    @Column({ unique: true })
     email: string;
 
     @Column({ default: '' })
