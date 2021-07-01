@@ -96,9 +96,14 @@ export class UsersService {
   async findAll(
     query: any
   ): Promise<{ users: User[], usersCount: number }> {
-    const queryBuilder = getRepository(User).createQueryBuilder('users');
-    queryBuilder.leftJoinAndSelect('users.usergroup', 'usergroups');
-    const columnsTosearch = [
+    const tableName = 'users';
+    const queryBuilder = getRepository(User).createQueryBuilder(tableName);
+    queryBuilder.leftJoinAndSelect(`${tableName}.usergroup`, 'usergroups');
+
+    // Поля таблицы, по которым можно фильтровать.
+    // Если имя поля в URL и в таблице различается,
+    // то используем массив [имя_поля_в_URL, имя_поля_в_таблице]
+    const columnsToSearch = [
       ['usergroup_id', 'usergroupId'],
       'login',
       'email',
@@ -107,22 +112,13 @@ export class UsersService {
       'last_name',
       'is_active'
     ];
-    for (let column of columnsTosearch) {
-      let filterConfig = {};
-      let filterStr = '';
-      if (Array.isArray(column)) {
-        if (query[column[0]]) {
-          filterStr += column[1] + '=:' + column[0];
-          filterConfig[column[0]] = query[column[0]];
-        }
-      } else {
-        if (query[column]) {
-          filterStr += column + '=:' + column;
-          filterConfig[column] = query[column];
-        }
-      }
-      if (filterStr !== '') {
-        queryBuilder.andWhere('users.' + filterStr, filterConfig);
+    for (let column of columnsToSearch) {
+      const c_0: string = Array.isArray(column) ? column[0] : column;
+      const c_1: string = Array.isArray(column) ? column[1] : column;
+      if (query[c_0]) {
+        let filterConfig = {};
+        filterConfig[c_0] = query[c_0];
+        queryBuilder.andWhere(`${tableName}.${c_1}=:${c_0}`, filterConfig);
       }
     }
     const usersCount = await queryBuilder.getCount();
@@ -130,7 +126,7 @@ export class UsersService {
     queryBuilder.offset(query.offset ? query.offset : 0);
     const orderType: "ASC" | "DESC" = query.ordertype ? query.ordertype.toUpperCase() : 'ASC';
     const order: string = query.order ? query.order : 'id';
-    queryBuilder.orderBy(`users.${order}`, orderType);
+    queryBuilder.orderBy(`${tableName}.${order}`, orderType);
     // console.log(queryBuilder.getQueryAndParameters())
     const users = await queryBuilder.getMany();
     return { users, usersCount }
