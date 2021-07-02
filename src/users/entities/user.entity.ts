@@ -1,6 +1,9 @@
-import { BeforeInsert, Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { BeforeInsert, Column, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { hash } from 'bcrypt';
 import { Usergroup } from "src/usergroups/entities/usergroup.entity";
+import { Task } from "src/tasks/entities/task.entity";
+import { Deal } from "src/deals/entities/deal.entity";
+import { Event } from "src/events/entities/event.entity";
 
 @Entity({ name: 'users' })
 export class User {
@@ -31,8 +34,36 @@ export class User {
     @Column({ default: '' })
     image: string;
 
+
+
+
     @ManyToOne(() => Usergroup, usergroup => usergroup.users, { onDelete: 'SET NULL', eager: true })
     usergroup: Usergroup;
+
+    @ManyToMany(() => Task, task => task.workerUsers, { onDelete: 'SET NULL' })
+    @JoinTable()
+    tasks_worker: Task[];
+
+    @OneToMany(() => Task, task => task.masterUser, { onDelete: 'SET NULL' })
+    tasks_master: Task[];
+
+    @OneToMany(() => Task, task => task.createUser, { onDelete: 'SET NULL' })
+    tasks_creator: Task[];
+
+    @OneToMany(() => Deal, deal => deal.workerUser, { onDelete: "SET NULL" })
+    deals: Deal[];
+
+    @OneToMany(() => Deal, deal => deal.doneUser, { onDelete: 'SET NULL' })
+    deals_done: Deal[];
+
+    @OneToMany(() => Event, event => event.user, { onDelete: 'SET NULL' })
+    events: Event[];
+
+    @OneToMany(() => Event, event => event.processUser, { onDelete: 'SET NULL' })
+    events_process: Event[];
+
+
+
 
     @BeforeInsert()
     async hashPassword() {
