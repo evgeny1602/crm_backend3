@@ -1,5 +1,6 @@
 import { ConnectionOptions } from "typeorm";
 
+
 const config: ConnectionOptions = {
     type: 'sqlite',
     database: './db.sqlite',
