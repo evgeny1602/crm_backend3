@@ -34,7 +34,7 @@ export class ClientaddressesController {
     @Body() createClientaddressDto: CreateClientaddressDto
   ): Promise<ClientaddressResponseInterface> {
     const clientaddress = await this.clientaddressesService.create(createClientaddressDto);
-    return this.clientaddressesService.buildClientResponse(clientaddress);
+    return this.clientaddressesService.buildClientaddressResponse(clientaddress);
   }
 
   @Get()
@@ -43,7 +43,7 @@ export class ClientaddressesController {
     @Query() query: any
   ): Promise<ClientaddressesResponseInterface> {
     const clientaddressesData = await this.clientaddressesService.findAll(query);
-    return this.clientaddressesService.buildClientsResponse(
+    return this.clientaddressesService.buildClientaddressesResponse(
       clientaddressesData.clientaddresses,
       clientaddressesData.clientaddressesCount
     );
@@ -55,7 +55,7 @@ export class ClientaddressesController {
     @Param('id') id: string
   ): Promise<ClientaddressResponseInterface> {
     const clientaddress = await this.clientaddressesService.findOne(+id);
-    return this.clientaddressesService.buildClientResponse(clientaddress);
+    return this.clientaddressesService.buildClientaddressResponse(clientaddress);
   }
 
   @Patch(':id')
@@ -68,7 +68,7 @@ export class ClientaddressesController {
       +id,
       updateClientaddressDto
     );
-    return this.clientaddressesService.buildClientResponse(clientaddress);
+    return this.clientaddressesService.buildClientaddressResponse(clientaddress);
   }
 
   @Delete(':id')

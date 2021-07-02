@@ -8,6 +8,7 @@ import { Task } from "src/tasks/entities/task.entity";
 
 @Entity({ name: 'events' })
 export class Event {
+
     @PrimaryGeneratedColumn()
     id: number;
 
@@ -17,7 +18,7 @@ export class Event {
     @Column({ nullable: false })
     start_datetime: Date;
 
-    @Column()
+    @Column({ nullable: true })
     process_datetime: Date;
 
     @ManyToOne(() => Eventtype, eventtype => eventtype.events, { onDelete: 'SET NULL' })

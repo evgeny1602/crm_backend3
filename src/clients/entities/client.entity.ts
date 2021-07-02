@@ -3,6 +3,7 @@ import { Clientgroup } from "src/clientgroups/entities/clientgroup.entity";
 import { Deal } from "src/deals/entities/deal.entity";
 import { Task } from "src/tasks/entities/task.entity";
 import { Clientaddress } from "src/clientaddresses/entities/clientaddress.entity";
+import { Event } from "src/events/entities/event.entity";
 
 
 @Entity({ name: 'clients' })
@@ -35,7 +36,7 @@ export class Client {
     @OneToMany(() => Deal, deal => deal.client, { onDelete: 'SET NULL' })
     deals: Deal[];
 
-    @OneToMany(() => Event, event => event.defaultPrevented, { onDelete: 'SET NULL' })
+    @OneToMany(() => Event, event => event.client, { onDelete: 'SET NULL' })
     events: Event[];
 
     @OneToMany(() => Task, task => task.client, { onDelete: "SET NULL" })

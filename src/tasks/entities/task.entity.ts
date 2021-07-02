@@ -7,6 +7,7 @@ import { Event } from "src/events/entities/event.entity"
 
 @Entity({ name: 'tasks' })
 export class Task {
+
     @PrimaryGeneratedColumn()
     id: number;
 
@@ -16,10 +17,10 @@ export class Task {
     @Column({ nullable: false })
     start_datetime: Date;
 
-    @Column()
+    @Column({ nullable: true })
     end_datetime?: Date;
 
-    @Column()
+    @Column({ nullable: true })
     done_datetime?: Date;
 
 
@@ -36,17 +37,11 @@ export class Task {
     @ManyToOne(() => User, user => user.tasks_creator, { onDelete: 'SET NULL' })
     createUser: User;
 
-
-
     @OneToOne(() => Event, event => event.task, { onDelete: 'SET NULL' })
     event?: Event;
 
-
-
     @ManyToOne(() => Deal, deal => deal.tasks)
     deal?: Deal;
-
-
 
     @ManyToOne(() => Client, client => client.tasks)
     client?: Client;

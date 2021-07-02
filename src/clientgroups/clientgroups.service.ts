@@ -101,9 +101,9 @@ export class ClientgroupsService {
   }
 
   buildClientgroupResponse(
-    usergroup: Clientgroup
+    clientgroup: Clientgroup
   ): ClientgroupResponseInterface {
-    return { usergroup }
+    return { clientgroup }
   }
 
   buildClientgroupsResponse(

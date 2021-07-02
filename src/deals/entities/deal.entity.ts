@@ -20,10 +20,11 @@ export class Deal {
     @Column({ nullable: false })
     start_datetime: Date;
 
-    @Column()
+    @Column({ nullable: true })
     end_datetime: Date;
 
-    @Column()
+
+    @Column({ nullable: true })
     done_datetime: Date;
 
     @ManyToOne(() => Dealtype, dealtype => dealtype.deals, { onDelete: 'SET NULL' })
