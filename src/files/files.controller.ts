@@ -2,6 +2,7 @@ import { Controller, Delete, HttpCode, HttpStatus, Param, Post, UploadedFile, Us
 import { FileInterceptor } from '@nestjs/platform-express';
 import { writeFile, unlink } from 'fs';
 import { AuthGuard } from 'src/users/guards/auth.guard';
+import { join } from 'path';
 
 @Controller('files')
 export class FilesController {
@@ -12,7 +13,7 @@ export class FilesController {
     @UseGuards(new AuthGuard())
     @HttpCode(HttpStatus.NO_CONTENT)
     async remove(@Param('filename') filename: string) {
-        const fname = this.staticDir + '/' + filename;
+        const fname = join(this.staticDir, filename);
         unlink(fname, () => {
             console.log(`${fname} removed`)
         });
@@ -22,7 +23,7 @@ export class FilesController {
     @UseInterceptors(FileInterceptor('file'))
     @UseGuards(new AuthGuard())
     uploadFile(@UploadedFile() file: Express.Multer.File) {
-        writeFile(this.staticDir + '/' + file.originalname, file.buffer, err => {
+        writeFile(join(this.staticDir, file.originalname), file.buffer, err => {
             return file.originalname;
         });
     }

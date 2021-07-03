@@ -14,9 +14,14 @@ import { EventtypesModule } from './eventtypes/eventtypes.module';
 import { TasksModule } from './tasks/tasks.module';
 import { TasktypesModule } from './tasktypes/tasktypes.module';
 import { FilesModule } from './files/files.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'static'),
+    }),
     TypeOrmModule.forRoot(ormconfig),
     UsersModule,
     UsergroupsModule,
