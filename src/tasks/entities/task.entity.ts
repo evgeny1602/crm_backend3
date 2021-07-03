@@ -29,13 +29,13 @@ export class Task {
     tasktype: Tasktype;
 
     @ManyToMany(() => User, user => user.tasks_worker)
-    workerUsers: User[];
+    worker_users: User[];
 
     @ManyToOne(() => User, user => user.tasks_master, { onDelete: 'SET NULL' })
-    masterUser: User;
+    master_user: User;
 
     @ManyToOne(() => User, user => user.tasks_creator, { onDelete: 'SET NULL' })
-    createUser: User;
+    create_user: User;
 
     @OneToOne(() => Event, event => event.task, { onDelete: 'SET NULL' })
     event?: Event;

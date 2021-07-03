@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToMany, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToMany, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Eventtype } from "src/eventtypes/entities/eventtype.entity";
 import { Client } from "src/clients/entities/client.entity";
 import { User } from "src/users/entities/user.entity";
@@ -28,6 +28,7 @@ export class Event {
     client: Client;
 
     @OneToOne(() => Task, task => task.event, { onDelete: 'SET NULL' })
+    @JoinColumn()
     task: Task;
 
     @ManyToOne(() => Deal, deal => deal.events, { onDelete: 'SET NULL' })

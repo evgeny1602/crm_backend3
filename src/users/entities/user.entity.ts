@@ -40,14 +40,14 @@ export class User {
     @ManyToOne(() => Usergroup, usergroup => usergroup.users, { onDelete: 'SET NULL', eager: true })
     usergroup: Usergroup;
 
-    @ManyToMany(() => Task, task => task.workerUsers, { onDelete: 'SET NULL' })
+    @ManyToMany(() => Task, task => task.worker_users, { onDelete: 'SET NULL' })
     @JoinTable()
     tasks_worker: Task[];
 
-    @OneToMany(() => Task, task => task.masterUser, { onDelete: 'SET NULL' })
+    @OneToMany(() => Task, task => task.master_user, { onDelete: 'SET NULL' })
     tasks_master: Task[];
 
-    @OneToMany(() => Task, task => task.createUser, { onDelete: 'SET NULL' })
+    @OneToMany(() => Task, task => task.create_user, { onDelete: 'SET NULL' })
     tasks_creator: Task[];
 
     @OneToMany(() => Deal, deal => deal.workerUser, { onDelete: "SET NULL" })

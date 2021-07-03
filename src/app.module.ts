@@ -13,6 +13,7 @@ import { EventsModule } from './events/events.module';
 import { EventtypesModule } from './eventtypes/eventtypes.module';
 import { TasksModule } from './tasks/tasks.module';
 import { TasktypesModule } from './tasktypes/tasktypes.module';
+import { FilesModule } from './files/files.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { TasktypesModule } from './tasktypes/tasktypes.module';
     EventtypesModule,
     TasksModule,
     TasktypesModule,
+    FilesModule,
   ],
   controllers: [],
   providers: [],
